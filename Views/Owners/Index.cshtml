@@ -1,0 +1,121 @@
+﻿@model PaginatedList<Mastende.Models.Owner>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+@*<h1>Index</h1>
+*@
+@if(User.Identity?.IsAuthenticated == true){ 
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+}
+
+<form asp-action="Index" method="get">
+    <p>
+        <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" placeholder="Search by name or location" />
+        <input type="submit" value="Search" />
+    </p>
+</form>
+
+<div class="d-flex flex-row flex-wrap">
+    @foreach (var item in Model)
+    {
+        <div class="card mb-3" style="width: 18rem; margin-right: 15px; margin-bottom: 15px;">
+
+            <div id="carouselExampleControls_@item.Id" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+
+                    @if (item.PicturesFile != null)
+                    {
+                        var imagePaths = item.PicturesFile.Split(',');
+
+                        @foreach (var imagePath in imagePaths)
+                        {
+                            <div class="carousel-item @(imagePath == imagePaths.First() ? "active" : "")">
+                                <img src="~/Images/@imagePath" class="card-img-top" style="object-fit: cover; height: 200px;" alt="Image">
+                            </div>
+                        }
+                    }
+
+                   
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls_@item.Id" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls_@item.Id" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-title">@Html.DisplayFor(modelItem => item.Fullname)</h5>
+                <p class="card-text">@Html.DisplayFor(modelItem => item.Location)</p>
+                <div class="card-text">
+                    <strong>Cell Number: </strong>
+                    <tel>@Html.DisplayFor(modelItem => item.CellNumber)</tel>
+                </div>
+                <p class="card-text">@Html.DisplayFor(modelItem => item.Description)</p>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <h5 class="card-text">@Html.DisplayFor(modelItem => item.Bedrooms) <img src="~/icons/bedroom-sleeping-svgrepo-com.svg" /> </h5>
+                        
+                    </div>
+                    <div class="col-sm-4">
+                        <h5 class="card-text">@Html.DisplayFor(modelItem => item.Bathrooms) <img src="~/icons/bathroom-svgrepo-com.svg" /> </h5>
+                    </div>
+                    <div class="col-sm-4">
+                        <h5 class="card-text">@Html.DisplayFor(modelItem => item.Garage) <img src="~/icons/car-garage-svgrepo-com.svg" /> </h5>
+                    </div>
+                </div>
+
+                <p class="card-text mt-2">
+
+                    <strong>Price: </strong>@String.Format("R{0:N2}", item.Price)
+
+@*    <strong>Price: </strong>@String.Format("{0:C}", item.Price)
+*@</p>
+
+                
+                
+                    <div class="btn-group">
+
+                        <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-secondary">Details</a>
+
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                        <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-primary">Edit</a>
+                        <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-danger">Delete</a>
+                    }
+                    </div>
+                
+            </div>
+        </div>
+    }
+</div>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(ViewBag.CurrentPage == 1 || ViewBag.TotalPages == 0 ? "disabled" : "")">
+            <a class="page-link" href="?page=1">First</a>
+        </li>
+        <li class="page-item @(ViewBag.CurrentPage == 1 || ViewBag.TotalPages == 0 ? "disabled" : "")">
+            <a class="page-link" href="?page=@(ViewBag.CurrentPage - 1)">Previous</a>
+        </li>
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                <a class="page-link" href="?page=@i">@i</a>
+            </li>
+        }
+        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages || ViewBag.TotalPages == 0 ? "disabled" : "")">
+            <a class="page-link" href="?page=@(ViewBag.CurrentPage + 1)">Next</a>
+        </li>
+        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages || ViewBag.TotalPages == 0 ? "disabled" : "")">
+            <a class="page-link" href="?page=@ViewBag.TotalPages">Last</a>
+        </li>
+    </ul>
+</nav>
